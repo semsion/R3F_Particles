@@ -12,6 +12,7 @@ const withPWA = require('@ducanh2912/next-pwa').default({
 })
 
 const nextConfig = {
+  output: 'export',
   // uncomment the following snippet if using styled components
   // compiler: {
   //   styledComponents: true,
@@ -22,7 +23,16 @@ const nextConfig = {
     appDir: true,
   },
   images: {},
+  future: {
+    webpack5: true, // by default, if you customize webpack config, they switch back to version 4.
+    // Looks like backward compatibility approach.
+  },
   webpack(config, { isServer }) {
+    config.resolve.fallback = {
+      ...config.resolve.fallback, // if you miss it, all the other options in fallback, specified
+      // by next.js will be dropped. Doesn't make much sense, but how it is
+      fs: false, // the solution
+    }
     if (!isServer) {
       // We're in the browser build, so we can safely exclude the sharp module
       config.externals.push('sharp')
